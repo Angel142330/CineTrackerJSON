@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function () {
           var nombre = boton.getAttribute("data-nombre");
 
           Swal.fire({
-              title: `¿Estás seguro de eliminar ${nombre}?`,
+              title: `¿Estás seguro de eliminar <br> ${nombre}?`,
               text: "Verifica antes de continuar",
               icon: "question",
               showCancelButton: true,
@@ -26,3 +26,31 @@ document.addEventListener("DOMContentLoaded", function () {
       });
   });
 });
+
+
+// ! ESTRELLA
+
+const stars = document.querySelectorAll(".star1");
+const raitingInput = document.getElementById("raitingInput");
+
+stars.forEach((star, index) => {
+  star.addEventListener("click", () => {
+    raitingInput.value = index + 1;
+
+    for (let i = 0; i <= index; i++) {
+      stars[i].classList.add("checked");
+    }
+
+    for (let i = index + 1; i < stars.length; i++) {
+      stars[i].classList.remove("checked");
+    }
+  });
+
+  star.addEventListener("dblclick", () => {
+    raitingInput.value =0;
+
+    for (let i = 0; i < stars.length; i++) {
+      stars[i].classList.remove("checked");
+    }
+  });
+}); 
