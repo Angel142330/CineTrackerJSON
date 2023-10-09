@@ -2,8 +2,6 @@
 
 const ARCHIVO_DESTINOS = 'data/peliculas.json';
 
-$vistas = [];
-$pendientes = [];
 
 if (file_exists(ARCHIVO_DESTINOS) && filesize(ARCHIVO_DESTINOS) > 0) {
     $contenidoArchivo = file_get_contents(ARCHIVO_DESTINOS);
@@ -79,18 +77,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit();
 }
 
-$ratings = array_column($vistas, 'rating');
-$nombres = array_column($vistas, 'nombre');
 
 // Ordena primero por rating de forma descendente, y luego por nombre de forma ascendente en vistas
+$ratings = array_column($vistas, 'rating');
+$nombres = array_column($vistas, 'nombre');
 array_multisort($ratings, SORT_DESC, $nombres, SORT_DESC, $vistas);
 
 //Ordenar por nombre en pendientes
 usort($pendientes, function ($a, $b) {
     return strcasecmp($a['nombre'], $b['nombre']);
 });
-
-$peliculas = file_exists(ARCHIVO_DESTINOS) ? json_decode(file_get_contents(ARCHIVO_DESTINOS), true) : [];
 
 ?>
 
@@ -114,7 +110,6 @@ $peliculas = file_exists(ARCHIVO_DESTINOS) ? json_decode(file_get_contents(ARCHI
 <body>
     <div class="container-fluid">
         <h1 class="text-center mt-2 ">Mi Cine Tracker</h1>
-
 
         <div class="container mb-3 ">
             <form method="post" action="" class="form1 p-3 rounded col-md-6 mx-auto">
@@ -141,8 +136,6 @@ $peliculas = file_exists(ARCHIVO_DESTINOS) ? json_decode(file_get_contents(ARCHI
                 </div>
             </form>
         </div>
-
-
 
         <div class="row">
             <div class="col-md-6">
