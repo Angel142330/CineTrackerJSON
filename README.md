@@ -14,5 +14,4 @@ Esta aplicación web te permite almacenar y gestionar tus películas y series de
 2. Agrega nuevas películas o series con su correspondiente rating.
 3. Explora tu lista y mantén un seguimiento de tus gustos cinematográficos.
 
-¡Disfruta de tu experiencia cinematográfica con Mi Cine Tracker!
 
