@@ -10,7 +10,7 @@ if (file_exists(ARCHIVO_DESTINOS) && filesize(ARCHIVO_DESTINOS) > 0) {
     $peliculasAnteriores = json_decode($contenidoArchivo, true);
 
     foreach ($peliculasAnteriores as $pelicula) {
-        if ($pelicula['raiting'] == '' || $pelicula['raiting'] == null) {
+        if ($pelicula['rating'] == '' || $pelicula['rating'] == null) {
             $pendientes[] = $pelicula;
         } else {
             $vistas[] = $pelicula;
@@ -33,26 +33,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['eliminar_vista'])) {
         $idEliminar = $_POST['eliminar_vista'];
 
-        array_splice($vistas, $idEliminar, 1);
+        foreach ($vistas as $key => $pelicula) {
+            if ($pelicula['id'] === $idEliminar) {
+                array_splice($vistas, $key, 1);
+                break;
+            }
+        }
+
         $peliculasAnteriores = array_merge($vistas, $pendientes);
         guardarPeliculas($peliculasAnteriores);
     } elseif (isset($_POST['eliminar_pendiente'])) {
         $idEliminar = $_POST['eliminar_pendiente'];
 
-        array_splice($pendientes, $idEliminar, 1);
+        foreach ($pendientes as $key => $pelicula) {
+            if ($pelicula['id'] === $idEliminar) {
+                array_splice($pendientes, $key, 1);
+                break;
+            }
+        }
+
         $peliculasAnteriores = array_merge($vistas, $pendientes);
         guardarPeliculas($peliculasAnteriores);
 
         header("Location: index.php");
         exit();
-    } elseif (isset($_POST['nombre']) || isset($_POST['raiting'])) {
+    } elseif (isset($_POST['nombre']) || isset($_POST['rating'])) {
         $nuevaPelicula = [
+            'id' => uniqid(),
             'nombre' => $_POST['nombre'],
-            'raiting' => ($_POST['raiting'] != '0') ? $_POST['raiting'] : null,
+            'rating' => ($_POST['rating'] != '0') ? $_POST['rating'] : null,
         ];
 
+
         // Agregar la nueva película al array correspondiente
-        if ($nuevaPelicula['raiting'] === null) {
+        if ($nuevaPelicula['rating'] === null) {
             $pendientes[] = $nuevaPelicula;
         } else {
             $vistas[] = $nuevaPelicula;
@@ -64,6 +78,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header("Location: index.php");
     exit();
 }
+
+$ratings = array_column($vistas, 'rating');
+$nombres = array_column($vistas, 'nombre');
+
+// Ordena primero por rating de forma descendente, y luego por nombre de forma ascendente en vistas
+array_multisort($ratings, SORT_DESC, $nombres, SORT_DESC, $vistas);
+
+//Ordenar por nombre en pendientes
+usort($pendientes, function ($a, $b) {
+    return strcasecmp($a['nombre'], $b['nombre']);
+});
 
 $peliculas = file_exists(ARCHIVO_DESTINOS) ? json_decode(file_get_contents(ARCHIVO_DESTINOS), true) : [];
 
@@ -81,8 +106,8 @@ $peliculas = file_exists(ARCHIVO_DESTINOS) ? json_decode(file_get_contents(ARCHI
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <!-- Google fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
     <title>MiCineTracker</title>
 </head>
 
@@ -107,7 +132,7 @@ $peliculas = file_exists(ARCHIVO_DESTINOS) ? json_decode(file_get_contents(ARCHI
                             <i class="bi bi-star-fill star1"></i>
                             <i class="bi bi-star-fill star1"></i>
                             <i class="bi bi-star-fill star1"></i>
-                            <input type="hidden" name="raiting" id="raitingInput" value="0">
+                            <input type="hidden" name="rating" id="raitingInput" value="0">
                         </div>
                     </div>
                     <div class=" mx-auto text-center mt-3">
@@ -137,10 +162,10 @@ $peliculas = file_exists(ARCHIVO_DESTINOS) ? json_decode(file_get_contents(ARCHI
                                 <?php foreach ($vistas as $key => $value) : ?>
                                     <tr>
                                         <td><?= $value['nombre'] ?></td>
-                                        <td><?= $value['raiting'] ?></td>
+                                        <td><?= $value['rating'] ?></td>
                                         <td>
                                             <form method="post" action="" id="form-vistas-<?= $key ?>" class="form-eliminar">
-                                                <input type="hidden" name="eliminar_vista" value="<?= $key ?>">
+                                                <input type="hidden" name="eliminar_vista" value="<?= $value['id'] ?>">
                                                 <button class="btn btn-warning eliminar-pelicula" data-nombre="<?= $value['nombre'] ?>" data-form-id="form-vistas-<?= $key ?>" type="submit"><i class="bi bi-trash"></i></button>
                                             </form>
                                         </td>
@@ -174,7 +199,7 @@ $peliculas = file_exists(ARCHIVO_DESTINOS) ? json_decode(file_get_contents(ARCHI
                                         <td> Pendiente</td>
                                         <td>
                                             <form method="post" action="" id="form-pendientes-<?= $key ?>" class="form-eliminar">
-                                                <input type="hidden" name="eliminar_pendiente" value="<?= $key ?>">
+                                                <input type="hidden" name="eliminar_pendiente" value="<?= $value['id'] ?>">
                                                 <button class="btn btn-warning eliminar-pelicula" data-nombre="<?= $value['nombre'] ?>" data-form-id="form-pendientes-<?= $key ?>" type="submit"><i class="bi bi-trash"></i></button>
                                             </form>
                                         </td>
@@ -189,7 +214,7 @@ $peliculas = file_exists(ARCHIVO_DESTINOS) ? json_decode(file_get_contents(ARCHI
             </div>
         </div>
     </div>
-                        
+
     <script src="js/script.js"></script>
     <script src="https://kit.fontawesome.com/10244c556d.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
