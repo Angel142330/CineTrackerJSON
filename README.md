@@ -6,7 +6,7 @@ Esta aplicación web te permite almacenar y gestionar tus películas y series de
 
 ## Características
 
-- **Almacenamiento en formato JSON:** Utilizamos JSON para almacenar la información de tus películas y series. Esto facilita la manipulación de datos y la interoperabilidad.
+- **Almacenamiento en formato JSON:** Utilizamos JSON para almacenar la información de tus películas y series.
 
 - **Rating Personalizado:** Asigna un rating a cada película o serie que hayas visto. Si aún no la has visto, simplemente déjalo en blanco para indicar que está en tu lista de pendientes.
 
