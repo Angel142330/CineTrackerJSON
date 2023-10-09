@@ -1,7 +1,5 @@
 # Mi Cine Tracker
 
-¡Bienvenido a Mi Cine Tracker!
-
 Esta aplicación web te permite almacenar y gestionar tus películas y series de TV, junto con sus respectivos ratings. 
 
 ## Características
