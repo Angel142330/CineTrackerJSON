@@ -15,3 +15,4 @@ Esta aplicación web te permite almacenar y gestionar tus películas y series de
 3. Explora tu lista y mantén un seguimiento de tus gustos cinematográficos.
 
 
+![Programador GIF](https://media.tenor.com/N-fJ0Azh_ykAAAAC/cat-computer.gif)
