@@ -53,8 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $peliculasAnteriores = array_merge($vistas, $pendientes);
         guardarPeliculas($peliculasAnteriores);
 
-        header("Location: index.php");
-        exit();
+        
     } elseif (isset($_POST['nombre']) || isset($_POST['rating'])) {
         $nuevaPelicula = [
             'id' => uniqid(),
