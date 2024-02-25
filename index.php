@@ -1,8 +1,10 @@
 <?php
 
 const ARCHIVO_DESTINOS = 'data/peliculas.json';
+$arrayErrores = [];
 
-
+$vistas = [];
+$pendientes = [];
 if (file_exists(ARCHIVO_DESTINOS) && filesize(ARCHIVO_DESTINOS) > 0) {
     $contenidoArchivo = file_get_contents(ARCHIVO_DESTINOS);
     $peliculasAnteriores = json_decode($contenidoArchivo, true);
@@ -52,28 +54,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $peliculasAnteriores = array_merge($vistas, $pendientes);
         guardarPeliculas($peliculasAnteriores);
-
-        
     } elseif (isset($_POST['nombre']) || isset($_POST['rating'])) {
-        $nuevaPelicula = [
-            'id' => uniqid(),
-            'nombre' => $_POST['nombre'],
-            'rating' => ($_POST['rating'] != '0') ? $_POST['rating'] : null,
-        ];
 
+        if ($_POST['nombre'] == '') {
+            $arrayErrores['nombre'] = "Nombre es obligatorio";
+        } 
 
-        // Agregar la nueva película al array correspondiente
-        if ($nuevaPelicula['rating'] === null) {
-            $pendientes[] = $nuevaPelicula;
-        } else {
-            $vistas[] = $nuevaPelicula;
+        if(empty($arrayErrores)){
+            $nuevaPelicula = [
+                'id' => uniqid(),
+                'nombre' => $_POST['nombre'],
+                'rating' => ($_POST['rating'] != '0') ? $_POST['rating'] : null,
+            ];
+
+            // Agregar la nueva película al array correspondiente
+            if ($nuevaPelicula['rating'] === null) {
+                $pendientes[] = $nuevaPelicula;
+            } else {
+                $vistas[] = $nuevaPelicula;
+            }
+
+            $peliculasAnteriores = array_merge($vistas, $pendientes);
+            guardarPeliculas($peliculasAnteriores);
+            header("Location: index.php");
+            exit();
         }
-
-        $peliculasAnteriores = array_merge($vistas, $pendientes);
-        guardarPeliculas($peliculasAnteriores);
     }
-    header("Location: index.php");
-    exit();
+    
 }
 
 
@@ -116,7 +123,8 @@ usort($pendientes, function ($a, $b) {
                     <div class=" mx-auto mb-3 me-3">
                         <label for="destinoInput" class="form-label">Nueva película</label>
                         <div class="input-group">
-                            <input type="text" class="form-control" name="nombre" id="destinoInput" placeholder="Ingrese el nombre" autocomplete="off" required>
+                            <input type="text" class="form-control" name="nombre" id="destinoInput" placeholder="Ingrese el nombre" autocomplete="off">
+                            <p style="color: red;"><?= (isset($arrayErrores['nombre'])) ? $arrayErrores['nombre']: ''      ?></p>
                         </div>
                     </div>
 
@@ -133,6 +141,7 @@ usort($pendientes, function ($a, $b) {
                         <button class="btn btn-lg btn-form" type="submit"><i class="bi bi-plus-square"></i></button>
                     </div>
                 </div>
+
             </form>
         </div>
 
